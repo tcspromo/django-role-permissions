@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import inspect
 
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.contrib.auth.models import Permission
 from rolepermissions.roles import RolesManager
 from rolepermissions.permissions import PermissionsManager
 from rolepermissions.shortcuts import get_user_role, get_permission
@@ -42,8 +42,7 @@ def has_permission(user, permission_name):
 
     if role and permission_name in role.permission_names_list():
         permission = get_permission(permission_name)
-
-        if permission in user.user_permissions.all():
+        if permission in user.user_permissions.all() or permission.codename in [p.codename for p in Permission.objects.filter(group__user=user)]:
             return True
 
     return False
